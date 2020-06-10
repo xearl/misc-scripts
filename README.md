@@ -4,7 +4,7 @@ This repo contains some miscellaneous scripts
 
 ## Perl scripts:
 
-`renImg2CreDate.pl:`
+`renImg2CreDate.pl - Rename image file with creation date as prefix:`
 
     Usage: ./renImg2CreDate.pl [-i | -d] imagefile | [imagefiles]
         -i    Display meta data
@@ -20,7 +20,7 @@ files.
 Requires Image-ExifTool (https://exiftool.org/)
 
 
-`chImgModDate.pl`
+`chImgModDate.pl - Change image file modification date to creation date`
 
     Usage: ./chImgModDate.pl [-d] imagefile | [imagefiles]
         -d    Perform dry run (no file updates)

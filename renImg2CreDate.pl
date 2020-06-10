@@ -23,22 +23,20 @@ my $only_info = 0;                                # only print meta data
 sub fileCreationDate {
   my $file = shift;
   my @sb = stat $file;                            # get file info
-  #print "stat =", (localtime $sb[9])[5], "\n";
   my $date = ((localtime $sb[9])[5]+1900).":";    # start with year
+
   if ( (localtime $sb[9])[4] > 8 ) {              # check # of digits
     $date .= ((localtime $sb[9])[4]+1).":";       # add month
   } else {
     $date .= "0".((localtime $sb[9])[4]+1).":";   # with leading 0
   }
+
   if ( (localtime $sb[9])[3] >= 10 ) {            # check # digits
     $date .= (localtime $sb[9])[3];
   } else {
     $date .= "0".(localtime $sb[9])[3];
   }
-#  (scalar localtime $sb[9]) =~ /.*(\d\d:\d\d:\d\d)/;
-#  print "fileCreationDate: $date\n";
-#  $date .= $1;
-#  print "fileCreationDate: $date\n";
+
   return $date;
 }
 ##############################################################
@@ -49,6 +47,7 @@ sub fileCreationDate {
 sub creationDate {
   my $file = shift;
   my $info = $exifTool->ImageInfo($file);
+
   if ( defined $$info{Error} ) {                  # if error in metadata
     print " Error file $file: $$info{Error}\n";
     return "";
@@ -65,6 +64,7 @@ sub creationDate {
   } else {
     print "$$info{FileName} is not an image file! Skipping ...\n";
   }
+
   return "";
 }
 
@@ -75,11 +75,13 @@ sub printImageInfo {
   my $info = $exifTool->ImageInfo($file);
   my $group = '';
   my $tag;
+
   foreach $tag ($exifTool->GetFoundTags('Group0')) {
     if ($group ne $exifTool->GetGroup($tag)) {
       $group = $exifTool->GetGroup($tag);
       print "---- $group ----\n";
     }
+
     my $val = $info->{$tag};
     if (ref $val eq 'SCALAR') {
       if ($$val =~ /^Binary data/) {
@@ -89,8 +91,10 @@ sub printImageInfo {
         $val = "(Binary data $len bytes)";
       }
     }
+
     printf("%-15s : %-32s : %s\n", $tag, $exifTool->GetDescription($tag), $val);
   }
+
   print "###################################################################",
       "##########\n";
 }
@@ -112,18 +116,6 @@ sub changeModificationDate {
 
   # Convert to epoch time format
   my $time = timelocal(@date);
-#  print "CreateDate = ", $crdate, "\n";
-#  $crdate =~ /(\d+):(\d+):(\d+) (\d+):(\d+):(\d+)/;
-#  my $year = $1;
-#  my $month = $2;
-#  my $day = $3;
-#  my $hour = $4;
-#  my $min = $5;
-#  my $sec = $6;
-#  print "Date regexp result = ", $year, ," ", $month, " ", $day, "\n" ;
-#  print "Time regexp result = ", $hour, ," ", $min, " ", $sec, "\n" ;
-#  my $time = timelocal($sec,$min,$hour,$day,$month,$year);
-  #  print "timelocal = ", $time, "\n";
   if ($dry) {
     print "Dryrun: Updated: $file modification date to $crdate \n";
   } elsif (utime ($time, $time, $file))  {
@@ -145,16 +137,14 @@ sub renameImageFile {
       printImageInfo($file);
       return 1;
   }
+
   if ( $dt = creationDate($file)) {
-#      printImageInfo($file);
-#      print "$file Date : $dt ";                    # print date info
     $dt =~ s/:/-/g;                             # change : to _ as separator
-#     print "New $dt\n";
+
     $newfile = $path."P".$dt."_".$filename.$suffix;
     print "New file $newfile\n";
 
     if ( ($file =~ /P(\d{4}-\d{2}-\d{2})/) && ($1 eq $dt) ) {
-#      print "Matched : $1, $file\n";
       print "$file is allready appended with date info!\n";
       changeModificationDate($file);
     } elsif ($dry == 1)  {
@@ -171,25 +161,16 @@ sub renameImageFile {
   } else {
     print "Could not get date for $file!\n";
   }
-return 0;
+
+  return 0;
 }
 # ---- Simple procedural usage ----
 
 # Get hash of meta information tag names/values from an image
-# my $info = $exifTool->ImageInfo('IMG_0174.JPG');
-# my $info = $exifTool->ImageInfo('DSC00006.JPG');
 # my $filename = 'DSC00006.txt';
-#my $filename = 'erland.gif';
-#my $filename = 'test1.pl';
-#my $filename = 'myzip.zip';
-
 
 #my $info = $exifTool->ImageInfo($filename);
 #my $type = Image::ExifTool::GetFileType($filename);
-#print "$info \n";
-#print '$info not initialised\n' if ! $info;
-#print "$filename is binary\n" if -B $filename;
-
 
 #if ($type) {
 #    print $type, "\n";
@@ -218,6 +199,7 @@ if (@ARGV > 0 ) {
       $dry = 1;
       shift @ARGV;
   }
+
   if ($ARGV[0] eq "-i") {
       $only_info = 1;
       shift @ARGV;
@@ -235,11 +217,9 @@ if (@ARGV > 0 ) {
       chomp @fls;
       print "$ar is a directory, skipping! \n";
       $dc++;
-#      foreach my $fl ( do_dir($ar) ) {            # list contents
-#	$fc += extractJPGsIfZip($fl) if -f $fl;   # try to extract file
-#	$dc += 1 if -d $fl;
     }
   }
+
 } else {
 
   my @fls = `ls`;
@@ -257,6 +237,7 @@ if (@ARGV > 0 ) {
     }
   }
 }
+
 print "$fc image files found\n";
 print "$ec unsuccessful rename attempts\n";
 print "$dc directories found\n";

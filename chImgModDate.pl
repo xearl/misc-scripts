@@ -33,22 +33,6 @@ sub changeModificationDate {
 
   # Convert to epoch time format
   my $time = timelocal(@date);
-#  print "\@date = @date\n";
-## Test part to check how to convert date/time to epoch
-
-#  print "CreateDate = ", $crdate, "\n";
-#  $crdate =~ /(\d+):(\d+):(\d+) (\d+):(\d+):(\d+)/;
-#  my $year = $1;
-#  my $month = $2-1;
-#  my $day = $3;
-#  my $hour = $4;
-#  my $min = $5;
-#  my $sec = $6;
-#  print "Date regexp result = ", $year, ," ", $month, " ", $day, "\n" ;
-#  print "Time regexp result = ", $hour, ," ", $min, " ", $sec, "\n" ;
-#  my $time = timelocal($sec,$min,$hour,$day,$month,$year);
-#  my $time = timegm($sec,$min,$hour,$day,$month,$year);
-#  print "timelocal = ", $time, "\n";
   if ($dry) {
     print "Dryrun: Updated: $file modification date to $crdate \n";
   } elsif (utime ($time, $time, $file))  {
@@ -56,6 +40,7 @@ sub changeModificationDate {
   } else {
     print "Could not update modification date of $file\n";
   }
+
 }
 ################################################################
 # Changes modification date of the passed file to creation date,
@@ -80,7 +65,8 @@ sub changeImageFileDate {
   } else {
     print "$$info{FileName} is not an image file! Skipping ...\n";
   }
-return 0;
+
+  return 0;
 }
 
 # ---- Object-oriented usage ----
@@ -115,11 +101,9 @@ if (@ARGV > 0 ) {
       chomp @fls;
       print "$ar is a directory, skipping! \n";
       $dc++;
-#      foreach my $fl ( do_dir($ar) ) {            # list contents
-#	$fc += extractJPGsIfZip($fl) if -f $fl;   # try to extract file
-#	$dc += 1 if -d $fl;
     }
   }
+
 } else {             # Not used yet, script req. > 0 arguments
 
   my @fls = `ls`;
@@ -137,6 +121,7 @@ if (@ARGV > 0 ) {
     }
   }
 }
+
 print "$fc image files found\n";
 print "$ec unsuccessful modification attempts\n";
 print "$dc directories found\n";
